@@ -7,17 +7,25 @@ import com.fundamentosplazi.springboot.fundamentos.component.ComponentDependency
 import com.fundamentosplazi.springboot.fundamentos.entity.User;
 import com.fundamentosplazi.springboot.fundamentos.pojo.UserPojo;
 import com.fundamentosplazi.springboot.fundamentos.repository.UserRepository;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.commons.logging.Log;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+
 @SpringBootApplication
 public class FundamentosApplication implements CommandLineRunner {
+
+
+	private final Log logger =  LogFactory.getLog(this.getClass());
+
 
 	private MyBeanWhitProperties myBeanWhitProperties;
 	private ComponentDependency ComponentDependency;
@@ -49,7 +57,20 @@ public class FundamentosApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		PreviousExamples();
 		SaveUserInDB();
+		getInformationJpqlFromUser();
 		}
+
+	private  void getInformationJpqlFromUser(){
+		logger.info("Usuario con el metodo findByUserEmail"+
+				userRepository.findByUserEmanil("exampel1@gmail.com")
+				.orElseThrow(()->new RuntimeException("No se encontro el usuario")));
+
+		userRepository.findAndSort("user",Sort.by("id").descending())
+				.stream()
+				.forEach(user -> logger.info("El usuario encontrado con Sort" + user));
+
+
+	}
 
 	private void SaveUserInDB(){
 		User user1 =new User("user1","exampel1@gmail.com", LocalDate.now());
